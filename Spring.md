@@ -285,3 +285,234 @@ List<Account> accountList = repository.findAll(); //Iterable 타입임
 - config 클래스 만들고 설정 아래꺼 참고.
   - https://github.com/vega2k/SpringBoot_Thymeleaf_UserApp/blob/master/src/main/java/me/vega2k/user/restthymeleaf/config/WebConfig.java
 - jpa 설정도 백명숙 강사님 깃허브 참고
+
+
+
+### xml로 하기
+
+```
+@RequestMapping(value="/usersXml",produces = {"application/xml"})
+	public List<User> getUsersXML(){
+		return repository.findAll();
+	}
+```
+
+- 이대로 postman 에서 조회하면 에러난다 JOSN 은 알아서 해석해 주지만 XML 은 해석해주는 것이 없다.
+
+  - 의존성 추가
+
+  - ```
+    <dependency>
+     
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+     
+    <artifactId>jackson-dataformat-xml</artifactId>
+     
+    <version>2.9.6</version>
+    </dependency>
+    
+    ```
+
+  - 추가 후 제대로 나옴 다만 출력결과를 맞춰줄려면?
+
+- 1. ppt 80 페이지 참고 각 속성에 @JacksonXmlProperty 추가
+
+- 2. 새로운 entity 객체 생성
+
+  ```
+  Controller
+  
+  @RequestMapping(value="/usersXml",produces = {"application/xml"})
+  	public Users getUsersXML(){
+  		
+  		Users userXml = new Users();
+  		userXml.setUsers(repository.findAll());
+  		return userXml;
+  	}
+  ```
+
+  ```
+  Users
+  
+  package com.keunwoo.myspringboot.entity;
+  
+  import java.io.Serializable;
+  import java.util.ArrayList;
+  import java.util.List;
+  
+  import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+  import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+  import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+  
+  @JacksonXmlRootElement
+  public class Users implements Serializable {
+  	private static final long serialVersionUID = 22L;
+  	
+  	@JacksonXmlProperty(localName = "User")
+  	@JacksonXmlElementWrapper(useWrapping = false)
+  	private List<User> users = new ArrayList<>();
+  
+  	public void setUsers(List<User> users) {
+  		this.users = users;
+  	}
+  
+  	public List<User> getUsers() {
+  		return users;
+  	}
+  }
+  
+  ```
+
+  - @JacksonXmlElementWrapper(useWrapping = false) 를 지우면 기본 true 가 되고
+
+    한번 더 감싸게 된다. 감싸지 말라고 설정한다.
+
+    
+
+  
+
+  
+
+  ###  Spring Boot Web MVC : 정적 리소스 맵핑 커스터 마이징
+
+- src/main/resources 밑에 templates 에 xx.html 을 저장한다. (thymeleaf)
+
+- but!! custom 폴더를 만들고 파일을 추가할려면 새로운 폴더에 대한 정보를 저장해줘야한다.
+
+- config > WebConfig 파일에 설정을 추가한다. ppt 83
+
+  - 1. Navigator 로 경로 확인
+    2. mobile 폴더 추가 
+    3. html 추가
+    4. config 패키지에 configuration 생성
+    5. 오버라이드 addresourcehandler 
+
+```
+package com.keunwoo.myspringboot.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfiguration implements WebMvcConfigurer{
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		//해당 url 패턴을 매칭
+		registry.addResourceHandler("/mobile/**")
+		//반드시 디렉토리이름 다음에 /을 주어야 한다.
+		.addResourceLocations("classpath:/mobile/")
+		.setCachePeriod(20); //20초
+	}
+	
+}
+
+```
+
+- .addResourceLocations("classpath:/mobile/") 리소스 위치
+- registry.addResourceHandler("/mobile/**") 매칭된 url 등록
+
+
+
+- 파비콘은 static 밑에 favicon.ico 로 생성한다.
+
+  
+
+## ThymeLeaf
+
+JSP 는 잘 안쓰이게됨. War 로 말아야하기 때문에 servlet 엔진 쓰고잇고 뭐 등등
+
+- 서버사이드
+
+- 의존성 주입하기
+
+  ```
+  <dependency>
+   
+  <groupId>org.springframework.boot</groupId>
+   
+  <artifactId>spring-boot-starter-thymeleaf</artifactId>
+  </dependency>
+  
+  ```
+
+- 타임리프 템플릿 위치는 /src/main/resources/templates/
+- 참고사이트
+  - https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#standard-expression-syntax
+  - https://www.thymeleaf.org/doc/tutorials/3.0/thymeleafspring.html
+- Local 실행은 그대로 나오지만 서버사이드로 실행시키면 제대로 나온다.
+
+
+
+- @controller 생성
+
+  ```
+  @Controller
+  public class UserController {
+  
+  	@GetMapping("/leaf")
+  	public String hello(Model model) {
+  		
+  		model.addAttribute("myName","keunwoo");
+  		
+  		return "leaf_first";
+  	}
+  	
+  }
+  ```
+
+  
+
+- html 생성
+
+  ```
+  <!DOCTYPE html>
+  <html xmlns:th="http://www.thymeleaf.org">
+  <head>
+  <meta charset="EUC-KR">
+  <title>Insert title here</title>
+  </head>
+  <body>
+  	<h2 th:text="${myName}">Hello ThymeLeaf</h2>
+  	<h1 th:text="${myName}">Name</h1>
+  	<h1>
+  		Hello, <span th:text="${myName}"></span>
+  	</h1>
+  	<h1>Hello, [[${myName}]]</h1>
+  
+  </body>
+  </html>
+  ```
+
+- 제대로 되면 myName 값으로 치환되야함.
+
+
+
+- UTF-8 로 해야 한글 안깨짐  windows -> preference 에서 설정
+
+
+
+### + 디비와 연동하기
+
+- repository 가져오기
+
+  ```
+  컨트롤러
+  
+  	@Autowired
+  	UserRepository userRepository;
+  	
+  	@GetMapping("/index")
+  	public ModelAndView getUsers() {
+  		List<User> userList = userRepository.findAll();
+  		return new ModelAndView("index", "users", userList);
+  	}
+  ```
+
+  
+
+- 템플릿 밑에 index.html 이 존재해야 한다.
+
+
+
