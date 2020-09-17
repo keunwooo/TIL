@@ -514,5 +514,153 @@ JSP 는 잘 안쓰이게됨. War 로 말아야하기 때문에 servlet 엔진 �
 
 - 템플릿 밑에 index.html 이 존재해야 한다.
 
+ ```
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<table>
+		<tr>
+			<th>Name</th>
+			<th>Email</th>
+		</tr>
+
+		<tr th:each="user : ${users}">
+			<td th:text="${user.name}"></td>
+			<td th:text="${user.email}"></td>
+		</tr>
+
+	</table>
+</body>
+</html>
+ ```
+
+- validation 과정
+
+  - 입력 값 Check 시 client 단에서 주로 server 단에서 Check 한다
+  -  @Valid @NotBlank 같은 어노테이션 사용
+  - @Model Attribute form 데이터를 객체에 자동으로 넣어주는 @임.
+  - @Valid 는 기존의 ModelAttribute + validation
+
+- Controller 에서 에러나면 @notBlank 에서 설정한 메시지가 자동으로 아규먼트에 저장
+
+- 입력이 없으면 계속 페이지에 머뭄. 입력 시 정상 동작
+
+- ppt 91
+
+  ```
+  controller
+  
+  @GetMapping("/signup")
+  	public String addUserForm(User user) {
+  		return "add-user";
+  	}
+  	-----------------------------
+  	add-user.html
+  	
+  	<form action="#" th:action="@{/adduser}" th:object="${user}"
+  		method="post">
+  		<label for="name">Name</label>
+  		<input type="text" th:field="*{name}" id="name"> 
+  			<span th:if="${#fields.hasErrors('name')}"
+  			th:errors="*{name}"></span>
+  			 <br />
+  		<label for="email">Email</label>
+  		<input type="text" th:field="*{email}" id="email"> 
+  		<span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span> <br />
+  		<input type="submit" value="Add User">
+  	</form>
+  ```
+  - add-user.hmtl 에서 user 객체를 사용하니까
+
+  - controller 에서 User타입의 인자로 받아야한다.
+
+    ```
+    <span th:if="${#fields.hasErrors('name')}"
+    			th:errors="*{name}"></span>
+    			
+    			th:if 네임 필드에 에러가 있나 확인
+                th:errors 네임 필드에 에러메시지를 뿌려준다. 
+    ```
+
+    
+
+- @NotBlank(message = "Name is Mandatory") 과 세트로
+  - controller에서 @VALID 사용한다 
 
 
+
+
+
+배포는 클라이언트 + 서버 합쳐서 배포한다.
+
+### CORS 
+
+- @CrossOrigin 어노테이션 사용
+
+- @CrossOrigin(origins="http://localhost:18080")
+
+  ```
+  @CrossOrigin(origins = "http://localhost:3000")
+  @RestController
+  public class RESTUserController {
+  	
+  	private final UserRepository repository;
+  	//autowired 안하고 이렇게 해도됨.
+  	public RESTUserController(UserRepository repository) {
+  		super();
+  		this.repository = repository;
+  	}
+  ```
+
+  
+
+이런식으로 사용
+
+가로질러서 사용이 가능.
+
+react 에서 같이 사용할려면?
+
+- 일단 리액트 프로젝트 생성.
+- package.josn 파일 생성된거 확인 -> 명령어 확인
+- npm run build 서버랑 붙일 거 생성중
+- build 폴더 생성된거 확인
+- build 밑에 파일을 전부 복사해서 resource 의 static 에 붙여넣기
+- 하고 서버 스타트 하고 properties 에서 설정한 포트로 접근 및 확인
+- 그리고 자르로 하나로 만들어서  ㄱㄱ한다 
+
+
+
+- 단점은 수정사항이 생기면 다시 빌드하고 과정이 번거롭게 된다.
+
+
+
+## Actuator
+
+- 모니터링 기능 제공
+
+
+
+- 의존성 설치
+
+  ```
+  <dependency>
+   
+  <groupId>org.springframework.boot</groupId>
+   
+  <artifactId>spring-boot-starter-actuator</artifactId>
+  </dependency>
+  
+  ```
+
+  
+
+- http://localhost:8086/actuator 로 접근
+- properties 에 옵션 추가 가능
+- management.endpoints.web.exposure.include=* 등..
+- 시각화 처리
+  - https://github.com/codecentric/spring-boot-admin
+  - 
