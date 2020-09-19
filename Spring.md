@@ -663,4 +663,118 @@ react 에서 같이 사용할려면?
 - management.endpoints.web.exposure.include=* 등..
 - 시각화 처리
   - https://github.com/codecentric/spring-boot-admin
-  - 
+
+
+
+- 새로운 프로젝트 생성 web 체크 생성
+
+  - ```
+    <dependency>
+     
+    <groupId>de.codecentric</groupId>
+     
+    <artifactId>spring-boot-admin-starter-server</artifactId>
+     
+    <version>2.1.4</version>
+    </dependency>
+    
+    
+    @SpringBootApplication
+    @EnableAdminServer
+    public class SpringbootAdminApplication {
+    } 
+    
+    ```
+
+  - 원래 프로젝트에는
+
+  - ```
+    <dependency>
+     
+    <groupId>de.codecentric</groupId>
+     
+    <artifactId>spring-boot-admin-client</artifactId>
+     
+    <version>2.1.4</version>
+    </dependency>
+    
+    properties 에 추가
+    spring.boot.admin.client.url=http://localhost:8090
+    
+    ```
+
+  - http://localhost:8090/ 으로 접속
+
+  - 접속후 밑의 8086 으로 끝나는 유알엘 접속 하면 밑에 키가 생김
+
+  - 그 키를 누르면 세부 화면으로 들어감
+
+- devtools 는 개발모드에서만 사용해야 한다. -> spring.devtools.restart.enabled 를 꺼야한다
+
+- porperties 에서 설정 
+
+
+
+- critical 한 정보는 뺴주고 싶어 beans 같은거 properties 에서 설정
+
+  - ```
+    management.endpoints.web.exposure.include=*
+    management.endpoints.web.exposure.exclude=env,beans
+    ```
+
+
+
+
+
+## Security
+
+
+
+- security 설정 후 로그인 --> f12 에서 애플리케이션 cookie 확인
+- 매번 패스워드로 다시 로그인 할 수는 없으니까 미리 설정된 파일을 만들자.
+
+
+
+- 데이터베이스에서 패스워드를 쳐보면 그대로 다나온다. 패스워드를 인코딩해서 넣자.
+- 타임리프쓰는 페이지는 tamplate 밑
+
+
+
+- ppt 그대로 참고하는게 빠를듯.
+- .antMatchers("/mypage/**").authenticated() 이페이지만 인증을 걸고
+  .antMatchers("/**").permitAll() 나머지는 전부 허용
+
+
+
+- .and() 를 쓰면 다시 http 시큐리티를 반환해준다.
+- configure(HttpSecurity http) 
+
+
+
+- DI 객체생성하자마자 바로 바로호출하려면 -> @postcontructor 사용
+
+
+
+
+
+
+
+## 추가 학습
+
+- Serializable 에 대해서
+- JPA relation 예제확인
+- lombok 에 대해서
+  - 의존성 추가
+  - 해당 자르를 sts가 알고잇어야 정상작동한다
+  - 위치로 가서 jar를 등록해서 sts위치를 알려주자. 
+  - 디펜던시에서 lombok 위치 확인 탐색기로 그위치까지 간다.
+  - cmd 에서 경로복사해서 이동 
+  - java -jar lombok-1.18.12.jar
+  - 고추화면이 뜬다. 여기서 sts 경로 설정해주기 
+  - help 에섯 about spring ~~ 에서 맨밑에 lombok 된 메시지 확인
+
+
+
+
+
+- 
