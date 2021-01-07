@@ -1,6 +1,123 @@
-### kubernetis (k8s)
+# kubernetes (k8s)
 
----
+
+
+**쿠버네티스는 컨테이너 오케스트레이션이다**
+
+- 여러 대의 도커 호스트를 하나의 클러스터로 만들어 준다는 점은 같지만, 세부적인 기능을 더욱 폭넓게 제공하고 있기 때문에 실제 운영에 쿠버네티스를 더 많이 쓴다.
+
+
+
+**쿠버네티스 장점**
+
+- 서버 자원 클러스터링, 마이크로서비스 구조의 컨테이너 배포, 서비스 장애 복구 등 컨테이너 기반의 서비스 운영에 필요한 대부분의 오케스트레이션 기능을 폭넓게 지원한다.
+
+- 구글,레드햇을 비롯한 많은 오픈소스 진영에서 쿠버네티스의 소스코드에 기여하고 있기 때문에 성능과 안전성 면에서 신뢰받고 있다.
+- 영속적 볼륨, 스케줄링, 장애 복구, 오토 스케일링, 서비스 디스커버리 및 인그레스 등 컨테이너 기반의 클라우드를 운영할 때 필요한 대부분의 기능과 컴포넌트를 사용자가 직접 커스터마이징 할 수 있다.
+
+
+
+**CNCF**
+
+ 마이크로서비스 및 컨테이너 기반의 클라우드와 관련된 오픈소스 프로젝트를 관리함으로써 생태계를 확장해 나가기 위한 리눅스 재단 산하의 단체이다.
+
+
+
+**쿠버네티스 설치**
+
+kubectl은 쿠버네티스에 접근해 API를 사용하기 위한 명령어이다. 
+
+```
+kubectl version --short #버전확인
+```
+
+
+
+Minikube는 가상머신 또는 도커를 통해 쿠버네티스를 설치하기 때문에 버추얼박스 또는 도커 엔진이 미리 설치돼 있어야 한다.
+
+- 버추얼 박스로 Minikube를 설치하는 방법
+- 리눅스 서버에서 가상 머신 없이 도커만으로 Minikube를 설치하는 방법
+
+
+
+**기본 설정을 이용해 버추얼 박스로 minikube 설치**
+
+1. 버츄얼 박스 설치
+
+   ```
+   apt-get install virtualbox
+   ```
+
+2. Minikube,kubectl 내려받기
+
+   ```
+   curl -Lo minikube \
+   https://storage.googleapis.com/minikube/releases/v1.4.0/minikube-linux-amd64 && \
+   chmod +x minikube && \
+   sudo mv minikube /usr/local/bin/
+   
+   curl -Lo kubectl \
+   https://storage.googleapis.com/kubernetes-release/releases/v1.16.0/bin/linux/amd64/kubectl && \
+   chmod +x kubectl && \
+   sudo mv kubectl /usr/local/bin/
+   ```
+
+   
+
+3. 미니큐브 가상머신 설치
+
+   ```
+   minikube start 
+   minikube start --kubernetes-version v1.13.5
+   ```
+
+
+
+**리눅스 서버에서 가상 머신 없이 도커 엔진만으로 minikube설치**
+
+```
+minikube start --vm-driver=none
+```
+
+
+
+
+
+**여러 서버로 구성된 쿠버네티스 클러스터 설치**
+
+최소한 3대 이상의 서버 준비
+
+메모리 스왑 비활성화
+
+```
+swapoff -a
+```
+
+1. 쿠버네티스 저장소 추가 책이 좀 뭔ㄱ 빠진듯?
+
+```
+curl -s http://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+
+cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
+deb http://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+```
+
+
+
+https://gist.github.com/ruanbekker/38a38aea5f325f7fa4a19e795ef4f0d0
+
+
+
+
+
+
+
+
+
+----
+
+
 
 https://kubernetes.io/ko/docs/concepts/overview/components/ 
 
