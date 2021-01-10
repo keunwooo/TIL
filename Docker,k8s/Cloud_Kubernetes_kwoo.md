@@ -570,16 +570,14 @@ https://kubernetes.io/ko/docs/concepts/overview/components/
 >   "storage-opts": [
 >     "overlay2.override_kernel_check=true"
 >   ]
-> }
-> EOF
-> # /etc/systemd/system/docker.service.d 생성
-> sudo mkdir -p /etc/systemd/system/docker.service.d
-> # 도커 재시작
-> sudo systemctl daemon-reload
-> sudo systemctl restart docker
-> # 부팅시 도커 시작
+ }
+ EOF
+ # /etc/systemd/system/docker.service.d 생성
+ sudo mkdir -p /etc/systemd/system/docker.service.d
+ # 도커 재시작
+ sudo systemctl daemon-reload
+ sudo systemctl restart docker
+ # 부팅시 도커 시작
 > sudo systemctl enable docker
-> ```
->
-> 
+ ```
 
