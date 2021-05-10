@@ -1,0 +1,90 @@
+---
+- name: start1
+  vars_files:
+    - common.yaml
+  hosts: master
+  vars:
+     touch_files_path: /root/touch_files
+     id: chan
+  become_user: yes
+  tasks:
+    - name: start
+      shell: echo 1
+
+- name: when test
+  vars_files:
+    - common.yaml
+  hosts: master
+  vars:
+     touch_files_path: /root/touch_files
+     id: chan
+  become_user: yes
+
+  tasks:
+    - name: mac address가 00:0c:29:0a:0c:26 인 경우 mac address! 출력
+      debug:
+        msg: echo "mac address!"
+      when: ansible_default_ipv4['macaddress'] == '00:0c:29:0a:0c:26'
+
+    - name: ip address가 192.168.235.21 인 경우 ip address! 출력
+      debug:
+        msg: echo "ip address!"
+      when: ansible_default_ipv4['address'] == '10.2.0.15'
+
+    - name: ansible_uptime_seconds이 5000보다 더 높은 경우 출력
+      debug:
+        msg: echo "uptime_seconds > 5000"
+      when: ansible_uptime_seconds > 5000
+
+    - name: ansible_uptime_seconds이 5000보다 더 낮은 경우 출력
+      debug:
+        msg: echo "uptime_seconds < 5000"
+      when: ansible_uptime_seconds < 5000
+
+    - name: make directory
+      file:
+         path: /root/touch_files
+         state: directory
+
+    - name: touch file test
+      file:
+         path: /root/touch_files/test.txt
+         state: touch
+
+    - name: make directory with var
+      file:
+         path: "{{touch_files_path}}"
+         state: directory
+
+    - name: touch file test with var
+      file:
+         path: "{{touch_files_path}}/{{id}}.txt"
+         state: touch
+
+    - name: loop touch file test
+      file:
+         path: "{{touch_files_path}}/{{item}}.txt"
+         state: touch
+      with_items:
+         - "{{id}}1"
+         - "{{id}}2"
+         - "{{id}}3"
+
+    - name: touch file test2
+      file:
+         path: "{{touch_files_path}}/{{item.id}}{{item.num}}.txt"
+         state: touch
+      with_items:
+         - {id: "{{id}}", num: 1}
+         - {id: "{{id}}", num: 2}
+         - {id: "{{id}}", num: 3}
+      when:
+       - ansible_distribution == "RHEL"
+       - ansbile_distribution_major_version == "7"
+       #- ansible_distribution == "RHEL" and ansible_distribution_major_version == "7")
+       - not result.stat.exists
+      
+
+
+
+
