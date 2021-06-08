@@ -106,3 +106,17 @@ etcdctl \
 
 (2번) 경우는 가장 먼저 kubelet 실행 상태가 정상인지 확인하는 것이 우선이다. kubelet 프로세스가 정상인지 실행 옵션에 문제가 있는지 확인해보자.
 
+
+
+---
+
+- `kubectl create` 명령어 및 `kubectl run`(파드 실행) 명령어에 익숙해지기
+- `--dry-run -o yaml` 옵션을 통해 대강의 뼈대를 구성하고 `kubernetes.io`를 참조하며 수정하기
+- `journalctl -u kubelet -f`로 `kubelet`의 로그 확인하기
+- `service kubelet status`로 `kubelet`의 상태 확인하기
+- `static pod`를 구성하는 방법 알아보기 (`kubelet`에서 `static pod` 위치 지정하는 것, 실제로 `static pod`를 생성해보는 것)
+- `etcdctl`을 통해 ETCD를 백업하고 복구하기
+- `kubeadm`을 통해 클러스터 구성하고, 업그레이드 하기
+- `kubeadm`을 통해 새로운 노드를 워커노드로 붙이기
+- `pv`, `pvc`를 통해 파드에 볼륨 추가하기
+- `taint`, `toleration`, `cordon`, `drain`, `nodeSelector`, `affinity`를 사용하여 파드가 뜨는 위치를 원하는 대로 조정하기
