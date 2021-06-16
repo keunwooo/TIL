@@ -1,0 +1,203 @@
+# Ingress
+
+
+
+Ingress는 일반적으로 외부에서 내부로 향하는 것을 지칭하는 단어이다.
+
+인그레스 트래픽 외부에서 서버로 유입되는 트래픽을 의미
+
+인그레스 네트워크 인그레스 트래픽을 처리하기 위한 네트워크
+
+외부요청을 어떻게 처리할것인지 네트워크 7계층 레벨에서 정의하는 쿠버네티스 오브젝트이다.
+
+
+
+기본기능
+
+- 외부 요청의 라우팅 - 특정 경로로 들어온 요청을 어떠한 서비스로 전달할지 정의하는 라우팅 규칙을 설정
+- 가상 호스트 기반의 요청 처리 - 같은 IP에 대해 다른 도메인 이름으로 요청이 도착했을 때, 어떻게 처리할 것인지 정의할 수 있다.
+- SSL/TLS 보안 연결 처리 - 여러개의 서비스로 요청을 라우팅 할 때, 보안 연결을 위한 인증서를 쉽게 적용 가능하다.
+
+
+
+인그레스의 요청을 처리할 서버로 무엇을 선택하느냐에 따라 기능이 조금씩 달라진다.
+
+
+
+쿠버네티스가 제공하는 인그레스 오브젝트를 사용하면 URL 엔드포인트를 단 하나만 생성함으로써 번거로움을 피할 수 있다.
+
+각 서비스의 URL로 접근할 필요 없이 Ingress를 통해 하나의 URL 로 접근이 가능해진다.
+
+
+
+인그레스에서 정의한 규칙에 따라 처리된 뒤 적절한 디플로이먼트의 포드로 전달된다.
+
+
+
+1. Nginx 컨트롤러 생성
+2. Nginx 컨트롤러를 외부로 노출하기 위한 서비스 생성
+3. 요청 처리 규칙을 정의하는 인그레스 오브젝트 생성
+4. Nginx 인그레스 컨트롤러로 들어온 요청은 인그레스 규칙에 따라 적절한 서비스로 전달
+
+
+
+Nginx 인그레스 컨트롤러는 항상 인그레스 리소스의 상태를 지켜보고 있으며, 기본적으로 모든 네임스페이스와 인그레스 리소스를 읽어와 규칙을 적용한다.
+
+     - path: /echo-hostname
+       backend:
+         serviceName: hostname-service
+         servicePort: 80
+/echo-hostname 라는 경로로 들어온 요청을 hostname-service라는 서비스의 80 포트로 전달한다.
+
+실제로 해당 서비스에 전달되는 것은 아니며 Nginx 인그레스 컨트롤러는 서비스에 의해 생성된 엔드포인트로 요청을 직접 전달한다. -> bypass라 한다
+
+서비스를 거치지 않고 포드로 직접 요청이 전달된다.
+
+
+
+```
+kubectl get ingress
+```
+
+```
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+ name: ingress-example
+ annotations:
+  nginx.ingress.kubernetes.io/rewrite-target: /
+  kubernetes.io/ingress.class: "nginx"
+spec:
+ rules:
+ - host: alicek106.example.com
+   http:
+     paths:
+     - path: /echo-hostname
+       backend:
+         serviceName: hostname-service
+         servicePort: 80
+```
+
+
+
+- host : 해당 도메인 이름으로 접근하는 요청에 대해서 처리 규칙을 적용한다.
+- path: 해당 경로에 들어온 요청을 어느 서비스로 전달할 것인지 정의한다.
+- serviceName, servicePort : path로 들어온 요청이 전달될 서비스와 포트이다.
+
+
+
+annotation 항목을 통해 인그레스의 추가적인 기능을 사용할 수 있다.
+
+
+
+인그레스는 인그레스 컨트롤러라고 하는 특수한 서버에 적용해야지만 그 규칙을 사용할 수 있음.
+
+실제로 외부요청을 받아들이는 것은 인그레스 컨트롤러 서버이며, 이 서버가 인그레스 규칙을 로드해 사용한다.
+
+
+
+Nginx 인그레스 컨트롤러 말고도 여러개가 존재하며, 그중에 맞는걸 선택해서 사용하면 됨
+
+쿠버네티스에서 공식적으로 개발되고 있는 Nginx 컨트롤러
+
+https://kubernetes.github.io/ingress-nginx/
+
+https://kubernetes.github.io/ingress-nginx/deploy/
+
+```
+kubectl apply -f https://raw.githubsercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
+```
+
+Nginx웹 서버를 외부로 노출하기 위한 서비스는 생성해주지 않는다. 서비스를 생성해줘야한다.
+
+
+
+```
+kind: Service
+apiVersion: v1
+metadata:
+ name: ingress-nginx
+ namespace: ingress-nginx
+spec:
+ type: LoadBalancer
+ selector:
+  app.kubernetes.io/name: ingress-nginx
+  app.kubernetes.io/part-of: ingress-nginx
+ ports:
+  - name: http
+    port: 80
+    targetPort: http
+  - name: https
+    port: 443
+    targetPort: https
+```
+
+
+
+도메인에 상관없이 서비스로 요청 전달
+
+```
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+ name: minimal-ingress
+spec:
+ backend:
+  serviceName: hostname-service
+  servicePort: 80
+```
+
+
+
+---
+
+### 세부기능
+
+annotation 을 이용한 설정 - 파일의 주석 항목을 사용함으로써 다양한 옵션을 사용할 수 있음.
+
+```
+ annotations:
+  nginx.ingress.kubernetes.io/rewrite-target: /
+  kubernetes.io/ingress.class: "nginx"
+```
+
+  kubernetes.io/ingress.class: "nginx" - 해당 인그레스 규칙을 어떤 인그레스 컨트롤러에 적용할 것인지를 의미한다.
+
+nginx.ingress.kubernetes.io/rewrite-target: - Nginx controller 에서만 사용이 가능한 주석, 인그레스에 정의된 경로로 들어오는 요청을 rewrite-tartget에 설정된 경로로 전달한다. 예를 들면 Nginx 인그레스 컨트롤러로 /echo-hostname 으로 접근하면 hostname-service에는 / 경로로 전달된다.
+
+rewrite-tartget은 /echo-hostname라는 경로로 시;작하는 모든 요청을 hostname-service의 /로 전달한다. 
+
+
+
+rewrite-target은 Nginx의 캡처 그룹과 함께 사용할때 유용한 기능이다.
+
+캡처그룹 - 정규 표현식의 형태로 요청 경로등의 값을 변수로서 사용할 수 있는 방법이다.
+
+
+
+```
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+ name: ingress-example
+ annotations:
+  nginx.ingress.kubernetes.io/rewrite-target: /$2
+  kubernetes.io/ingress.class: "nginx"
+spec:
+ rules:
+ - host: alicek106.example.com
+   http:
+     paths:
+     - path: /echo-hostname(/|$)(.*)
+       backend:
+         serviceName: hostname-service
+         servicePort: 80
+```
+
+
+
+(.*) 이라는 Nginx의 정규표현식을 통해 /echo-hostname 뒤에 오는 경로를 얻고 해당 값을 rewrite-target에서 사용한다.
+
+/echo-hostname 에 접근하면 기존과 같이 / 로 접근하고 /echo-hostname/color 는 /color 로 /echo-hostname/color/red 는 /color/red로 전달된다.
+
+즉, 요청경로를 다시 쓰는 것임!
