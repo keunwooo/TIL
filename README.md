@@ -12,6 +12,6 @@ Today I Learned
 ---
 
 작은 시간이 모여 온전한 시간이 된다..!
-rrr
+rrrr
 ---
 
