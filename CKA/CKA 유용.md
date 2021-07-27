@@ -13,3 +13,7 @@ https://blog.dudaji.com/kubernetes/2019/06/24/cka-acceptance-review-soonbee.html
 udemy 강의 해석
 
 https://github.com/jonnung/cka-practice
+
+
+
+https://blog.dudaji.com/kubernetes/2019/06/03/cka-tip.html
