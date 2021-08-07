@@ -17,3 +17,5 @@ https://github.com/jonnung/cka-practice
 
 
 https://blog.dudaji.com/kubernetes/2019/06/03/cka-tip.html
+
+---
