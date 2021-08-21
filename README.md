@@ -1,7 +1,3 @@
-# TIL
-
-Today I Learned
-
 ### 나의 다짐
 
 - 커밋 완료
