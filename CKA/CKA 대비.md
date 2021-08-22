@@ -120,3 +120,7 @@ etcdctl \
 - `kubeadm`을 통해 새로운 노드를 워커노드로 붙이기
 - `pv`, `pvc`를 통해 파드에 볼륨 추가하기
 - `taint`, `toleration`, `cordon`, `drain`, `nodeSelector`, `affinity`를 사용하여 파드가 뜨는 위치를 원하는 대로 조정하기
+
+
+
+명령어
