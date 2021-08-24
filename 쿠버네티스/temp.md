@@ -141,3 +141,67 @@ kubectl expose deployment hello-world --type=LoadBalancer --name=my-service
 
 # ingress
 
+
+
+
+
+
+
+
+
+---
+
+```
+apt update
+
+apt install docker.io
+
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
+
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+sudo sysctl --system
+
+cat > /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
+
+mkdir -p /etc/systemd/system/docker.service.d
+systemctl daemon-reload
+systemctl restart docker
+sudo systemctl enable docker
+
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl
+
+sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo swapoff -a
+
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+
+kubeadm join 10.2.0.207:6443 --token 6f9vkc.k4s7dt3ip5woydn7 \
+        --discovery-token-ca-cert-hash sha256:e0ee97681913b0a3740afac6b119f4a3acb8eb3f75da74a5ef2a34d72ce36d2a
+```
+
