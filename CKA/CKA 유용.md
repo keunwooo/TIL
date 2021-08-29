@@ -31,3 +31,9 @@ https://docs.linuxfoundation.org/tc-docs/certification/tips-cka-and-ckad
 
 
 https://github.com/kodekloudhub/certified-kubernetes-administrator-course
+
+
+
+---
+
+Udemy의 Kode 연습 사이트 사용
