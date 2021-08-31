@@ -8,6 +8,8 @@
 
 https://blog.chann.kr/posts/scratch-container-with-go/ 출처
 
+https://codefresh.io/docs/docs/learn-by-example/golang/golang-hello-world/ 출처
+
 ```
 FROM golang:1.16-alpine
 
