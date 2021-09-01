@@ -29,7 +29,7 @@ CMD ["./fems"]
 ```
 
 ```
-docker run --rm -it -d --name test -p 8080:8080 fems:0.1
+docker run --rm -it -d --name test -p 23523:8100 fems:0.1
 ```
 
 ```
